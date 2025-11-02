@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './swagger';
 import authRoutes from './auth/authRoutes';
 import postsRoutes from './posts/postsRoutes';
+import friendsRoutes from './friends/friendsRoutes';
 import { authenticate } from './auth/authMiddleware';
 import { updateProfile } from './auth/authController';
 import { PrismaClient } from '@prisma/client';
@@ -23,6 +24,7 @@ app.use('/auth', authRoutes);
 
 // Protected routes
 app.use('/posts', postsRoutes);
+app.use('/friends', friendsRoutes);
 
 /**
  * @swagger

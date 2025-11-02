@@ -5,7 +5,31 @@ const prisma = new PrismaClient();
 
 export const getPosts = async (req: Request, res: Response) => {
   try {
+    const userId = (req as any).user.id;
+
+    // Get all accepted friendships for the current user
+    const friendships = await prisma.friendship.findMany({
+      where: {
+        OR: [
+          { senderId: userId, status: 'accepted' },
+          { receiverId: userId, status: 'accepted' },
+        ],
+      },
+    });
+
+    // Extract friend IDs
+    const friendIds = friendships.map((friendship: { senderId: string; receiverId: string }) =>
+      friendship.senderId === userId ? friendship.receiverId : friendship.senderId
+    );
+
+    // Include the user's own posts as well
+    friendIds.push(userId);
+
+    // Get posts only from friends and the user
     const posts = await prisma.post.findMany({
+      where: {
+        userId: { in: friendIds },
+      },
       include: { user: true },
       orderBy: { createdAt: 'desc' },
     });

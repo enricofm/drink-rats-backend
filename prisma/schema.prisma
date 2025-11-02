@@ -11,14 +11,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  avatar    String?
-  createdAt DateTime @default(now())
-  posts     Post[]
-  tokens    Token[]
+  id                 String       @id @default(uuid())
+  name               String
+  email              String       @unique
+  password           String
+  avatar             String?
+  createdAt          DateTime     @default(now())
+  posts              Post[]
+  tokens             Token[]
+  sentFriendships    Friendship[] @relation("SentFriendships")
+  receivedFriendships Friendship[] @relation("ReceivedFriendships")
 
   @@map("usuarios")
 }
@@ -47,4 +49,18 @@ model Post {
   updatedAt DateTime @updatedAt
 
   @@map("postagem")
+}
+
+model Friendship {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     String   @default("pending") // "pending" or "accepted"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sender     User     @relation("SentFriendships", fields: [senderId], references: [id])
+  receiver   User     @relation("ReceivedFriendships", fields: [receiverId], references: [id])
+
+  @@unique([senderId, receiverId])
+  @@map("amizades")
 }
